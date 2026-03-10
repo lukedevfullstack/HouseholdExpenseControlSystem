@@ -21,7 +21,7 @@
 
 - [x] Identificador (deve ser um valor único gerado automaticamente);
 - [x] Descrição (texto com tamanho máximo de 400);
-- [x]Finalidade (despesa/receita/ambas)
+- [x] Finalidade (despesa/receita/ambas)
 
 
 ### Cadastro de transações: 
