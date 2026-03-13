@@ -1,52 +1,58 @@
-import React, { useEffect, useState } from 'react';
-import api from '../api/api';
-import { GeneralReport } from '../interfaces';
+import React, { useState } from 'react';
+import PersonSelector from '../components/PersonSelector';
+import SummaryCards from '../components/SummaryCards';
+import TransactionForm from '../components/TransactionForm';
+import TransactionTable from '../components/TransactionTable';
 
 const Dashboard: React.FC = () => {
-  const [report, setReport] = useState<GeneralReport | null>(null);
+  const [selectedPersonId, setSelectedPersonId] = useState<string>('');
+  const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
 
-  const loadData = async () => {
-    const response = await api.get<GeneralReport>('/person/totals');
-    setReport(response.data);
+  // Função para disparar a atualização de saldo e tabela após um novo cadastro
+  const handleTransactionSuccess = () => {
+    setRefreshTrigger(prev => prev + 1);
   };
 
-  useEffect(() => { loadData(); }, []);
-
-  if (!report) return <div>Carregando...</div>;
-
   return (
-    <div style={{ padding: '20px' }}>
-      <h2>Totais por Pessoa</h2>
-      <table border={1} style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr>
-            <th>Nome</th>
-            <th>Receitas</th>
-            <th>Despesas</th>
-            <th>Saldo</th>
-          </tr>
-        </thead>
-        <tbody>
-          {report.items.map((item, index) => (
-            <tr key={index}>
-              <td>{item.name}</td>
-              <td style={{ color: 'green' }}>R$ {item.totalRevenue.toFixed(2)}</td>
-              <td style={{ color: 'red' }}>R$ {item.totalExpense.toFixed(2)}</td>
-              <td>R$ {item.balance.toFixed(2)}</td>
-            </tr>
-          ))}
-        </tbody>
-        <tfoot style={{ backgroundColor: '#f0f0f0', fontWeight: 'bold' }}>
-          <tr>
-            <td>TOTAL GERAL</td>
-            <td style={{ color: 'green' }}>R$ {report.globalRevenue.toFixed(2)}</td>
-            <td style={{ color: 'red' }}>R$ {report.globalExpense.toFixed(2)}</td>
-            <td style={{ backgroundColor: report.netBalance >= 0 ? '#d4edda' : '#f8d7da' }}>
-              R$ {report.netBalance.toFixed(2)}
-            </td>
-          </tr>
-        </tfoot>
-      </table>
+    <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
+      <header style={{ marginBottom: '30px' }}>
+        <h1 style={{ color: '#2c3e50' }}>Dashboard Financeiro</h1>
+        <p style={{ color: '#7f8c8d' }}>Gerencie as contas da sua residência</p>
+      </header>
+
+      {/* 1. Seletor de Pessoa (Filtro Global) */}
+      <section style={{ marginBottom: '30px', backgroundColor: '#fff', padding: '15px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+        <PersonSelector onSelectPerson={setSelectedPersonId} />
+      </section>
+
+      {/* 2. Cards de Resumo (Receitas, Despesas e Saldo) */}
+      <SummaryCards personId={selectedPersonId} refresh={refreshTrigger} />
+
+      {/* 3. Grid de Conteúdo (Formulário à esquerda, Tabela à direita) */}
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', 
+        gap: '30px', 
+        marginTop: '30px' 
+      }}>
+        
+        {/* Coluna do Formulário */}
+        <aside>
+          <div style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
+            <h3 style={{ marginTop: 0 }}>Nova Transação</h3>
+            <TransactionForm onTransactionSuccess={handleTransactionSuccess} />
+          </div>
+        </aside>
+
+        {/* Coluna da Tabela */}
+        <main>
+          <div style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
+            <h3 style={{ marginTop: 0 }}>Histórico Recente</h3>
+            <TransactionTable refresh={refreshTrigger} />
+          </div>
+        </main>
+
+      </div>
     </div>
   );
 };

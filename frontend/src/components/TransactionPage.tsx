@@ -1,133 +1,105 @@
-import React, { useEffect, useState } from 'react';
-import api from '../api/api';
-import { Person, Category, Transaction } from '../interfaces';
+import React, { useState, useEffect } from 'react';
+import api from '../services/api/api';
+
+interface Transaction {
+  id: string;
+  description: string;
+  value: number;
+  type: string;
+  personName?: string; // Opcional, caso seu backend retorne o nome da pessoa
+  categoryDescription?: string;
+}
 
 const TransactionPage: React.FC = () => {
-  // Estados para dados do banco
-  const [persons, setPersons] = useState<Person[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Estados para o formulário
-  const [description, setDescription] = useState('');
-  const [value, setValue] = useState<number>(0);
-  const [type, setType] = useState<'Receita' | 'Despesa'>('Despesa');
-  const [personId, setPersonId] = useState('');
-  const [categoryId, setCategoryId] = useState('');
-
-  const loadInitialData = async () => {
-    const [resPersons, resCats, resTrans] = await Promise.all([
-      api.get<Person[]>('/person'),
-      api.get<Category[]>('/category'),
-      api.get<Transaction[]>('/transaction')
-    ]);
-    setPersons(resPersons.data);
-    setCategories(resCats.data);
-    setTransactions(resTrans.data);
+  const loadTransactions = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get<Transaction[]>('/Transaction');
+      setTransactions(response.data);
+    } catch (err) {
+      console.error("Erro ao carregar extrato", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  useEffect(() => { loadInitialData(); }, []);
+  useEffect(() => {
+    loadTransactions();
+  }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Validação básica front-end
-    if (!description || value <= 0 || !personId || !categoryId) {
-      return alert("Preencha todos os campos corretamente.");
-    }
-
-    try {
-      await api.post('/transaction', {
-        description,
-        value,
-        type,
-        personId,
-        categoryId
-      });
-      
-      // Limpar campos e recarregar lista
-      setDescription('');
-      setValue(0);
-      loadInitialData();
-      alert("Transação salva com sucesso!");
-    } catch (error: any) {
-      // Aqui capturamos o BadRequest do .NET (ex: Menor de idade tentando receita)
-      const message = error.response?.data || "Erro ao salvar transação.";
-      alert(message);
-    }
+  const formatCurrency = (value: number) => {
+    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   };
 
   return (
-    <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-      <h2>Cadastro de Transações</h2>
-
-      <form onSubmit={handleSubmit} style={{ 
-        display: 'grid', gap: '10px', padding: '20px', 
-        border: '1px solid #ddd', borderRadius: '8px', marginBottom: '30px' 
-      }}>
-        <input 
-          placeholder="Descrição" 
-          value={description} 
-          onChange={e => setDescription(e.target.value)} 
-          maxLength={400}
-        />
-
-        <input 
-          type="number" 
-          placeholder="Valor" 
-          value={value || ''} 
-          onChange={e => setValue(Number(e.target.value))} 
-        />
-
-        <select value={type} onChange={e => setType(e.target.value as any)}>
-          <option value="Despesa">Despesa</option>
-          <option value="Receita">Receita</option>
-        </select>
-
-        <select value={personId} onChange={e => setPersonId(e.target.value)}>
-          <option value="">Selecione a Pessoa</option>
-          {persons.map(p => (
-            <option key={p.id} value={p.id}>{p.name} ({p.age} anos)</option>
-          ))}
-        </select>
-
-        <select value={categoryId} onChange={e => setCategoryId(e.target.value)}>
-          <option value="">Selecione a Categoria</option>
-          {categories.map(c => (
-            <option key={c.id} value={c.id}>{c.description} ({c.purpose})</option>
-          ))}
-        </select>
-
-        <button type="submit" style={{ padding: '10px', backgroundColor: '#007bff', color: 'white', border: 'none', cursor: 'pointer' }}>
-          Salvar Transação
+    <div style={{ padding: '20px', maxWidth: '1000px', margin: '0 auto' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <h2>🧾 Extrato de Transações</h2>
+        <button 
+          onClick={loadTransactions} 
+          style={{ padding: '8px 15px', cursor: 'pointer', borderRadius: '4px', border: '1px solid #ccc' }}
+        >
+          🔄 Atualizar
         </button>
-      </form>
+      </div>
 
-      <h3>Lançamentos Recentes</h3>
-      <table border={1} style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr style={{ backgroundColor: '#f4f4f4' }}>
-            <th>Descrição</th>
-            <th>Pessoa</th>
-            <th>Categoria</th>
-            <th>Tipo</th>
-            <th>Valor</th>
-          </tr>
-        </thead>
-        <tbody>
-          {transactions.map(t => (
-            <tr key={t.id}>
-              <td>{t.description}</td>
-              <td>{(t as any).person?.name}</td>
-              <td>{(t as any).category?.description}</td>
-              <td style={{ color: t.type === 'Receita' ? 'green' : 'red' }}>{t.type}</td>
-              <td>R$ {t.value.toFixed(2)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {loading ? (
+        <p>Carregando transações...</p>
+      ) : (
+        <div style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead style={{ backgroundColor: '#f8f9fa' }}>
+              <tr>
+                <th style={tableHeaderStyle}>Descrição</th>
+                <th style={tableHeaderStyle}>Tipo</th>
+                <th style={tableHeaderStyle}>Valor</th>
+                <th style={tableHeaderStyle}>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {transactions.length > 0 ? (
+                transactions.map((t) => (
+                  <tr key={t.id} style={{ borderBottom: '1px solid #eee' }}>
+                    <td style={tableCellStyle}>{t.description}</td>
+                    <td style={{ ...tableCellStyle, color: t.type === 'Receita' ? '#27ae60' : '#e74c3c', fontWeight: 'bold' }}>
+                      {t.type}
+                    </td>
+                    <td style={tableCellStyle}>{formatCurrency(t.value)}</td>
+                    <td style={tableCellStyle}>
+                      {/* Espaço para botão de Deletar no futuro */}
+                      <span style={{ color: '#95a5a6', fontSize: '0.8rem' }}>ID: {t.id.substring(0, 8)}...</span>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4} style={{ padding: '20px', textAlign: 'center', color: '#7f8c8d' }}>
+                    Nenhuma transação encontrada.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
+};
+
+// Estilos rápidos para a tabela
+const tableHeaderStyle: React.CSSProperties = {
+  padding: '12px 15px',
+  textAlign: 'left',
+  borderBottom: '2px solid #dee2e6',
+  color: '#495057'
+};
+
+const tableCellStyle: React.CSSProperties = {
+  padding: '12px 15px',
+  color: '#212529'
 };
 
 export default TransactionPage;

@@ -7,14 +7,14 @@ SQLitePCL.Batteries.Init();
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Configuração do SQLite
+// 1. Configuraï¿½ï¿½o do SQLite
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 2. Registro dos Repositórios (Infrastructure)
+// 2. Registro dos Repositï¿½rios (Infrastructure)
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// 3. Registro dos Serviços (Application)
+// 3. Registro dos Serviï¿½os (Application)
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IPersonService, PersonService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -23,6 +23,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp",
+        policy => policy.AllowAnyOrigin() // Em produÃ§Ã£o, coloque a URL do seu Front
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+});
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -30,7 +38,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<DataContext>();
 
-    // Cria o banco (caso não exista)
+    // Cria o banco (caso nï¿½o exista)
     context.Database.EnsureCreated();
 
     // Alimenta o banco com dados iniciais
@@ -52,4 +60,5 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthorization();
 app.MapControllers();
+app.UseCors("AllowReactApp");
 app.Run();

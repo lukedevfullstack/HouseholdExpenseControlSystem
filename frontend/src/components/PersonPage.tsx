@@ -1,86 +1,115 @@
-import React, { useEffect, useState } from 'react';
-import api from '../api/api';
-import { Person } from '../interfaces';
+import React, { useState, useEffect } from 'react';
+import api from '../services/api/api';
+
+interface Person {
+  id: string;
+  name: string;
+  age: number;
+}
 
 const PersonPage: React.FC = () => {
   const [persons, setPersons] = useState<Person[]>([]);
   const [name, setName] = useState('');
-  const [age, setAge] = useState<number>(0);
+  const [age, setAge] = useState<number | ''>('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Carrega a listagem de pessoas
+  // 1. Carregar lista de pessoas ao abrir a página
   const loadPersons = async () => {
-    const response = await api.get<Person[]>('/person');
-    setPersons(response.data);
-  };
-
-  useEffect(() => { loadPersons(); }, []);
-
-  // Lógica para Criar Pessoa
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name || age <= 0) return alert("Preencha os campos corretamente!");
-
     try {
-      await api.post('/person', { name, age });
-      setName('');
-      setAge(0);
-      loadPersons(); // Atualiza a lista
-    } catch (error) {
-      alert("Erro ao salvar pessoa.");
+      const response = await api.get<Person[]>('/Person');
+      setPersons(response.data);
+    } catch (err) {
+      console.error("Erro ao buscar pessoas", err);
     }
   };
 
-  // Lógica para Deletar Pessoa (Garante a regra de apagar transações vinculadas)
-  const handleDelete = async (id: string) => {
-    if (window.confirm("Ao excluir esta pessoa, todas as suas transações serão apagadas. Confirmar?")) {
-      await api.delete(`/person/${id}`);
-      loadPersons();
+  useEffect(() => {
+    loadPersons();
+  }, []);
+
+  // 2. Função para salvar nova pessoa
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    try {
+      await api.post('/Person', { 
+        name, 
+        age: Number(age) 
+      });
+      
+      alert("Morador cadastrado com sucesso!");
+      setName('');
+      setAge('');
+      loadPersons(); // Atualiza a lista na tela
+    } catch (err: any) {
+      const msg = err.response?.data?.message || "Erro ao cadastrar morador.";
+      setError(msg);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-      <h2>Gerenciamento de Pessoas</h2>
-
+    <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
+      <h2>👥 Gerenciar Moradores</h2>
+      
       {/* Formulário de Cadastro */}
-      <form onSubmit={handleSubmit} style={{ marginBottom: '30px', display: 'flex', gap: '10px' }}>
-        <input 
-          type="text" 
-          placeholder="Nome (max 200)" 
-          value={name} 
-          onChange={(e) => setName(e.target.value)}
-          maxLength={200}
-        />
-        <input 
-          type="number" 
-          placeholder="Idade" 
-          value={age || ''} 
-          onChange={(e) => setAge(Number(e.target.value))}
-        />
-        <button type="submit">Cadastrar</button>
-      </form>
+      <section style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '8px', border: '1px solid #ddd', marginBottom: '30px' }}>
+        <h3>Novo Cadastro</h3>
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+        
+        <form onSubmit={handleSave} style={{ display: 'flex', gap: '10px' }}>
+          <input 
+            type="text" 
+            placeholder="Nome completo" 
+            value={name} 
+            onChange={e => setName(e.target.value)} 
+            required 
+            style={{ flex: 2, padding: '8px' }}
+          />
+          <input 
+            type="number" 
+            placeholder="Idade" 
+            value={age} 
+            onChange={e => setAge(e.target.value === '' ? '' : Number(e.target.value))} 
+            required 
+            style={{ flex: 1, padding: '8px' }}
+          />
+          <button 
+            type="submit" 
+            disabled={loading}
+            style={{ padding: '8px 20px', backgroundColor: '#27ae60', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+          >
+            {loading ? 'Salvando...' : 'Cadastrar'}
+          </button>
+        </form>
+      </section>
 
-      {/* Tabela de Listagem */}
-      <table border={1} style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr>
-            <th>Nome</th>
-            <th>Idade</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {persons.map((p) => (
-            <tr key={p.id}>
-              <td>{p.name}</td>
-              <td>{p.age} anos</td>
-              <td>
-                <button onClick={() => handleDelete(p.id!)} style={{ color: 'red' }}>Excluir</button>
-              </td>
+      {/* Tabela de Moradores Cadastrados */}
+      <section>
+        <h3>Moradores Atuais</h3>
+        <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'white' }}>
+          <thead>
+            <tr style={{ textAlign: 'left', borderBottom: '2px solid #eee' }}>
+              <th style={{ padding: '10px' }}>Nome</th>
+              <th style={{ padding: '10px' }}>Idade</th>
+              <th style={{ padding: '10px' }}>ID do Sistema</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {persons.map(p => (
+              <tr key={p.id} style={{ borderBottom: '1px solid #eee' }}>
+                <td style={{ padding: '10px' }}>{p.name}</td>
+                <td style={{ padding: '10px' }}>{p.age} anos</td>
+                <td style={{ padding: '10px', fontSize: '0.8rem', color: '#95a5a6' }}>{p.id}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
     </div>
   );
 };
