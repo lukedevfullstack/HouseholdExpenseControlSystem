@@ -1,4 +1,6 @@
-﻿namespace HouseholdExpenseControlSystem.Domain.Entities;
+﻿using HouseholdExpenseControlSystem.Domain.Exceptions;
+
+namespace HouseholdExpenseControlSystem.Domain.Entities;
 
 public class Transaction
 {
@@ -18,15 +20,15 @@ public class Transaction
     public static Transaction Create(string desc, decimal val, string type, Guid pId, Guid cId, int personAge, string categoryPurpose)
     {
         // Fail Fast Validation
-        if (val <= 0) throw new ArgumentException("O valor deve ser positivo.");
+        if (val <= 0) throw new DomainException("O valor deve ser positivo.");
 
         // Regra de Negócio: Menor de 18 não aceita Receita
         if (personAge < 18 && type == "Receita")
-            throw new InvalidOperationException("Menores de idade só podem registrar despesas.");
+            throw new DomainException("Menores de idade só podem registrar despesas.");
 
         // Regra de Negócio: Compatibilidade de Categoria
         if (categoryPurpose != "Ambas" && categoryPurpose != type)
-            throw new InvalidOperationException("Categoria incompatível com o tipo de transação.");
+            throw new DomainException("Categoria incompatível com o tipo de transação.");
 
         return new Transaction
         {

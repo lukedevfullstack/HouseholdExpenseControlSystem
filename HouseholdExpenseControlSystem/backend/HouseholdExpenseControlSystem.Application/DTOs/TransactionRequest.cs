@@ -1,4 +1,4 @@
-﻿namespace HouseholdExpenseControlSystem.Domain.DTOs;
+﻿namespace HouseholdExpenseControlSystem.Application.DTOs;
 
 // O que recebemos do Front-end
 public record TransactionRequest(

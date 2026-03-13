@@ -11,6 +11,12 @@ public class Category
 
     public Category(string description, string purpose)
     {
+        if (string.IsNullOrWhiteSpace(description))
+            throw new DomainException("A descrição da categoria não pode ser vazia.");
+
+        if (purpose != "Receita" && purpose != "Despesa" && purpose != "Ambas")
+            throw new DomainException("Finalidade da categoria inválida.");
+
         if (description.Length > 400) throw new DomainException("Descrição muito longa.");
 
         Id = Guid.NewGuid();

@@ -1,4 +1,4 @@
-﻿namespace HouseholdExpenseControlSystem.Domain.DTOs;
+﻿namespace HouseholdExpenseControlSystem.Application.DTOs;
 
 public record TransactionResponse(
     Guid Id,

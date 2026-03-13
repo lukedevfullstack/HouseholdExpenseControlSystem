@@ -1,5 +1,5 @@
-using HouseholdExpenseControlSystem.Domain.DTOs;
-using HouseholdExpenseControlSystem.Domain.Interfaces;
+using HouseholdExpenseControlSystem.Application.DTOs;
+using HouseholdExpenseControlSystem.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HouseholdExpenseControlSystem.WebAPI.Controllers;

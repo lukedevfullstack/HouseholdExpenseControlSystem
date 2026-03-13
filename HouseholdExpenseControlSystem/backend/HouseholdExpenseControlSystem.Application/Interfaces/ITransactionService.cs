@@ -1,6 +1,6 @@
-﻿using HouseholdExpenseControlSystem.Domain.DTOs;
+﻿using HouseholdExpenseControlSystem.Application.DTOs;
 
-namespace HouseholdExpenseControlSystem.Domain.Interfaces;
+namespace HouseholdExpenseControlSystem.Application.Interfaces;
 
 public interface ITransactionService
 {

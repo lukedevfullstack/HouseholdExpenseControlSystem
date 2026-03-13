@@ -31,8 +31,8 @@ public class TransactionRepository : ITransactionRepository
         throw new NotImplementedException();
     }
 
-    public Task<IEnumerable<Transaction>> GetByPersonIdAsync(Guid personId)
+    public async Task<IEnumerable<Transaction>> GetByPersonIdAsync(Guid personId)
     {
-        throw new NotImplementedException();
+        return await _context.Transactions.Where(t => t.PersonId == personId).ToListAsync();
     }
 }

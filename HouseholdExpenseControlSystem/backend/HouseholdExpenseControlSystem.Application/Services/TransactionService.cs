@@ -1,7 +1,7 @@
-﻿using HouseholdExpenseControlSystem.Domain.DTOs;
+﻿using HouseholdExpenseControlSystem.Application.DTOs;
+using HouseholdExpenseControlSystem.Application.Interfaces;
 using HouseholdExpenseControlSystem.Domain.Entities;
 using HouseholdExpenseControlSystem.Domain.Exceptions;
-using HouseholdExpenseControlSystem.Domain.Interfaces;
 using HouseholdExpenseControlSystem.Infrastructure.Interfaces;
 
 public class TransactionService : ITransactionService
