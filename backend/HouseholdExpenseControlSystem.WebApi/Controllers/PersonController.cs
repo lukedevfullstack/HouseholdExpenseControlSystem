@@ -33,6 +33,13 @@ public class PersonController : ControllerBase
     public async Task<IActionResult> GetAll()
         => Ok(await _personService.GetAllAsync());
 
+    [HttpGet("all-totals")]
+    public async Task<IActionResult> GetAllTotals()
+    {
+        var result = await _personService.GetAllPeopleTotalsAsync();
+        return Ok(result);
+    }
+
     [HttpGet("{id}/totals")]
     public async Task<IActionResult> GetTotals(Guid id)
     {

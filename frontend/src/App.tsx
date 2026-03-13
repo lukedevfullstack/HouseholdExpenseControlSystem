@@ -1,10 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import Dashboard from "./pages/Dashboard";
-import CategoryPage from "./components/CategoryPage";
+import CategoryPage from "./pages/CategoryPage";
 import CategoryTotalsPage from "./pages/CategoryTotalsPage";
-import TransactionPage from "./components/TransactionPage";
-import PersonPage from "./components/PersonPage";
+import TransactionPage from "./pages/TransactionPage";
+import PersonPage from "./pages/PersonPage";
+import PersonTotalsPage from './pages/PersonTotalsPage';
 
 const App: React.FC = () => {
     return (
@@ -17,8 +18,9 @@ const App: React.FC = () => {
                     <ul style={{ listStyle: 'none', padding: 0, marginTop: '20px' }}>
                         <li style={navItem}><Link to="/" style={linkStyle}>🏠 Dashboard</Link></li>
                         <li style={navItem}><Link to="/transacoes" style={linkStyle}>💸 Novo Lançamento</Link></li>
+                        <li style={navItem}><Link to="/moradores/resumo" style={linkStyle}>📊 Totais por Pessoa</Link></li>
                         <li style={navItem}><Link to="/categorias/cadastro" style={linkStyle}>📂 Categorias</Link></li>
-                        <li style={navItem}><Link to="/categorias/resumo" style={linkStyle}>📊 Relatórios</Link></li>
+                        <li style={navItem}><Link to="/categorias/resumo" style={linkStyle}>📊 Consulta de totais por categoria</Link></li>
                         <li style={navItem}><Link to="/moradores" style={linkStyle}>👥 Moradores</Link></li>
                     </ul>
                 </nav>
@@ -28,6 +30,7 @@ const App: React.FC = () => {
                     <Routes>
                         <Route path="/" element={<Dashboard />} />
                         <Route path="/transacoes" element={<TransactionPage />} />
+                        <Route path="/moradores/resumo" element={<PersonTotalsPage />} />
                         <Route path="/categorias/cadastro" element={<CategoryPage />} />
                         <Route path="/categorias/resumo" element={<CategoryTotalsPage />} />
                         <Route path="/moradores" element={<PersonPage />} />

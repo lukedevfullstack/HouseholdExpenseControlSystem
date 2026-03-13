@@ -50,4 +50,25 @@ public class PersonService : IPersonService
 
         return new PersonResponse(person.Id, person.Name, person.Age);
     }
+
+    public async Task<object> GetAllPeopleTotalsAsync()
+    {
+        var people = await _personRepo.GetAllWithTransactionsAsync();
+
+        var personTotals = people.Select(p => new {
+            Name = p.Name,
+            TotalRecipes = p.Transactions.Where(t => t.Type == "Receita").Sum(t => t.Value),
+            TotalExpenses = p.Transactions.Where(t => t.Type == "Despesa").Sum(t => t.Value),
+            Balance = p.Transactions.Where(t => t.Type == "Receita").Sum(t => t.Value) -
+                      p.Transactions.Where(t => t.Type == "Despesa").Sum(t => t.Value)
+        }).ToList();
+
+        return new
+        {
+            Data = personTotals,
+            GrandTotalRecipes = personTotals.Sum(x => x.TotalRecipes),
+            GrandTotalExpenses = personTotals.Sum(x => x.TotalExpenses),
+            NetBalance = personTotals.Sum(x => x.TotalRecipes) - personTotals.Sum(x => x.TotalExpenses)
+        };
+    }
 }

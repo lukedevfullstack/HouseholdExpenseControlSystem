@@ -53,6 +53,13 @@ public class PersonRepository : IPersonRepository
         };
     }
 
+    public async Task<IEnumerable<Person>> GetAllWithTransactionsAsync()
+    {
+        return await _context.Persons
+            .Include(p => p.Transactions)
+            .ToListAsync();
+    }
+
     public Task UpdateAsync(Person person)
     {
         throw new NotImplementedException();

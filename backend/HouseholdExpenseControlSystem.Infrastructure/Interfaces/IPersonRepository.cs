@@ -10,4 +10,5 @@ public interface IPersonRepository
     Task UpdateAsync(Person person);
     Task DeleteAsync(Guid id);
     Task<object> GetTotalsAsync(); // Para o relatório de saldos
+    Task<IEnumerable<Person>> GetAllWithTransactionsAsync();
 }
