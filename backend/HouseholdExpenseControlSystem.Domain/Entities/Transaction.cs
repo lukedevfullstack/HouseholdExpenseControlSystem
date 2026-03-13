@@ -1,4 +1,5 @@
 ﻿using HouseholdExpenseControlSystem.Domain.Exceptions;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HouseholdExpenseControlSystem.Domain.Entities;
@@ -6,7 +7,9 @@ namespace HouseholdExpenseControlSystem.Domain.Entities;
 public class Transaction
 {
     public Guid Id { get; private set; }
+    [MaxLength(400)]
     public string Description { get; private set; }
+    [Range(0.01, double.MaxValue)] // Regra: Valor positivo
     public decimal Value { get; private set; }
     public string Type { get; private set; } // "Receita" ou "Despesa"
     public Guid PersonId { get; private set; }

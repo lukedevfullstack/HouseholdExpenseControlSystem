@@ -46,10 +46,10 @@ const TransactionPage: React.FC = () => {
 
                 <form onSubmit={handleSubmit}>
 
-                    {/* CAMPO DESCRIÇÃO IGUAL À IMAGEM */}
+                    {}
                     <div style={{ marginBottom: '20px' }}>
                         <label style={labelStyle}>
-                            Descrição ({description.length}/400)
+                            são ({description.length}/400)
                         </label>
                         <textarea
                             maxLength={400}

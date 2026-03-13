@@ -1,9 +1,11 @@
 ﻿using HouseholdExpenseControlSystem.Domain.Exceptions;
+using System.ComponentModel.DataAnnotations;
 
 namespace HouseholdExpenseControlSystem.Domain.Entities;
 public class Category
 {
     public Guid Id { get; private set; }
+    [MaxLength(400)] // Regra: Tamanho máximo de 400
     public string Description { get; private set; }
     public string Purpose { get; private set; } // "Receita", "Despesa" ou "Ambas"
 
