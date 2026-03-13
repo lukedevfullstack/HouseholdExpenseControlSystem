@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36401.2 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HouseholdExpenseControlSystem.WebAPI", "HouseholdExpenseControlSystem.WebAPI.csproj", "{04E875AE-A8E9-4871-9013-6FF81EB70185}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HouseholdExpenseControlSystem.Domain", "..\HouseholdExpenseControlSystem.Domain\HouseholdExpenseControlSystem.Domain.csproj", "{F757FE9A-A6B8-4E42-A8FA-2E84D82659B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HouseholdExpenseControlSystem.Application", "..\HouseholdExpenseControlSystem.Application\HouseholdExpenseControlSystem.Application.csproj", "{FFB6BCF8-E316-4D8A-859B-C3A6FB0873B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HouseholdExpenseControlSystem.Infrastructure", "..\HouseholdExpenseControlSystem.Infrastructure\HouseholdExpenseControlSystem.Infrastructure.csproj", "{90918DFB-498A-4A06-95F5-58188840F3E9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HouseholdExpenseControlSystem.Tests", "..\HouseholdExpenseControlSystem.Tests\HouseholdExpenseControlSystem.Tests.csproj", "{1A3BD2D5-07F0-471C-A568-D4009201D022}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{04E875AE-A8E9-4871-9013-6FF81EB70185}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04E875AE-A8E9-4871-9013-6FF81EB70185}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04E875AE-A8E9-4871-9013-6FF81EB70185}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04E875AE-A8E9-4871-9013-6FF81EB70185}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F757FE9A-A6B8-4E42-A8FA-2E84D82659B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F757FE9A-A6B8-4E42-A8FA-2E84D82659B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F757FE9A-A6B8-4E42-A8FA-2E84D82659B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F757FE9A-A6B8-4E42-A8FA-2E84D82659B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFB6BCF8-E316-4D8A-859B-C3A6FB0873B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFB6BCF8-E316-4D8A-859B-C3A6FB0873B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFB6BCF8-E316-4D8A-859B-C3A6FB0873B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFB6BCF8-E316-4D8A-859B-C3A6FB0873B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90918DFB-498A-4A06-95F5-58188840F3E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90918DFB-498A-4A06-95F5-58188840F3E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90918DFB-498A-4A06-95F5-58188840F3E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90918DFB-498A-4A06-95F5-58188840F3E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A3BD2D5-07F0-471C-A568-D4009201D022}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A3BD2D5-07F0-471C-A568-D4009201D022}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A3BD2D5-07F0-471C-A568-D4009201D022}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A3BD2D5-07F0-471C-A568-D4009201D022}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {36CAA443-64BA-46AA-8DF3-7C0473A67430}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,6 @@
+@HouseholdExpenseControlSystem_HostAddress = http://localhost:5158
+
+GET {{HouseholdExpenseControlSystem_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
