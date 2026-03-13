@@ -1,4 +1,5 @@
 ﻿using HouseholdExpenseControlSystem.Domain.Exceptions;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HouseholdExpenseControlSystem.Domain.Entities;
 
@@ -12,7 +13,8 @@ public class Transaction
     public Guid CategoryId { get; private set; }
 
     public virtual Person Person { get; private set; }
-    public virtual Category Category { get; private set; }
+    [ForeignKey("CategoryId")]
+    public virtual Category Category { get; set; }
 
     // Construtor privado para forçar o uso da Factory/Validação
     private Transaction() { }

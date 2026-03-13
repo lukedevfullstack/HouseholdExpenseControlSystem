@@ -21,4 +21,11 @@ public class CategoryRepository : ICategoryRepository
         await _context.Categories.AddAsync(category);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<IEnumerable<Category>> GetAllWithTransactionsAsync()
+    {
+        return await _context.Categories
+            .Include(c => c.Transactions)
+            .ToListAsync();
+    }
 }

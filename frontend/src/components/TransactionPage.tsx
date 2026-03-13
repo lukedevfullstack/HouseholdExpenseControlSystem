@@ -1,105 +1,98 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import api from '../services/api/api';
 
-interface Transaction {
-  id: string;
-  description: string;
-  value: number;
-  type: string;
-  personName?: string; // Opcional, caso seu backend retorne o nome da pessoa
-  categoryDescription?: string;
-}
-
 const TransactionPage: React.FC = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Estados para carregar as opções dos seletores
+  const [people, setPeople] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
 
-  const loadTransactions = async () => {
-    setLoading(true);
+  // Estados do formulário
+  const [desc, setDesc] = useState('');
+  const [value, setValue] = useState(0);
+  const [type, setType] = useState('Despesa');
+  const [personId, setPersonId] = useState('');
+  const [categoryId, setCategoryId] = useState('');
+  const [message, setMessage] = useState({ text: '', type: '' });
+
+  useEffect(() => {
+    // Carrega moradores e categorias para os dropdowns
+    api.get('/Person').then(res => setPeople(res.data));
+    api.get('/Category').then(res => setCategories(res.data));
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const payload = {
+      description: desc,
+      value: value,
+      type: type,
+      personId: personId,
+      categoryId: categoryId
+    };
+
     try {
-      const response = await api.get<Transaction[]>('/Transaction');
-      setTransactions(response.data);
-    } catch (err) {
-      console.error("Erro ao carregar extrato", err);
-    } finally {
-      setLoading(false);
+      await api.post('/Transaction', payload);
+      setMessage({ text: 'Transação registrada com sucesso!', type: 'success' });
+      // Limpar campos
+      setDesc('');
+      setValue(0);
+    } catch (err: any) {
+      const errorMsg = err.response?.data?.message || 'Erro ao registrar transação.';
+      setMessage({ text: errorMsg, type: 'error' });
     }
   };
 
-  useEffect(() => {
-    loadTransactions();
-  }, []);
-
-  const formatCurrency = (value: number) => {
-    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  };
-
   return (
-    <div style={{ padding: '20px', maxWidth: '1000px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h2>🧾 Extrato de Transações</h2>
-        <button 
-          onClick={loadTransactions} 
-          style={{ padding: '8px 15px', cursor: 'pointer', borderRadius: '4px', border: '1px solid #ccc' }}
-        >
-          🔄 Atualizar
-        </button>
-      </div>
-
-      {loading ? (
-        <p>Carregando transações...</p>
-      ) : (
-        <div style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead style={{ backgroundColor: '#f8f9fa' }}>
-              <tr>
-                <th style={tableHeaderStyle}>Descrição</th>
-                <th style={tableHeaderStyle}>Tipo</th>
-                <th style={tableHeaderStyle}>Valor</th>
-                <th style={tableHeaderStyle}>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.length > 0 ? (
-                transactions.map((t) => (
-                  <tr key={t.id} style={{ borderBottom: '1px solid #eee' }}>
-                    <td style={tableCellStyle}>{t.description}</td>
-                    <td style={{ ...tableCellStyle, color: t.type === 'Receita' ? '#27ae60' : '#e74c3c', fontWeight: 'bold' }}>
-                      {t.type}
-                    </td>
-                    <td style={tableCellStyle}>{formatCurrency(t.value)}</td>
-                    <td style={tableCellStyle}>
-                      {/* Espaço para botão de Deletar no futuro */}
-                      <span style={{ color: '#95a5a6', fontSize: '0.8rem' }}>ID: {t.id.substring(0, 8)}...</span>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={4} style={{ padding: '20px', textAlign: 'center', color: '#7f8c8d' }}>
-                    Nenhuma transação encontrada.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+    <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px' }}>
+      <h2 style={{ color: '#2d3748' }}>Novo Lançamento</h2>
+      
+      {message.text && (
+        <div style={{ 
+          padding: '10px', 
+          marginBottom: '20px', 
+          borderRadius: '5px',
+          backgroundColor: message.type === 'success' ? '#c6f6d5' : '#fed7d7',
+          color: message.type === 'success' ? '#22543d' : '#822727'
+        }}>
+          {message.text}
         </div>
       )}
+
+      <form onSubmit={handleSubmit} style={formStyle}>
+        <label>Descrição</label>
+        <input style={inputStyle} type="text" value={desc} onChange={e => setDesc(e.target.value)} required placeholder="Ex: Compras do mês" />
+
+        <label>Valor (R$)</label>
+        <input style={inputStyle} type="number" step="0.01" value={value} onChange={e => setValue(parseFloat(e.target.value))} required />
+
+        <label>Tipo</label>
+        <select style={inputStyle} value={type} onChange={e => setType(e.target.value)}>
+          <option value="Despesa">Despesa</option>
+          <option value="Receita">Receita</option>
+        </select>
+
+        <label>Quem realizou?</label>
+        <select style={inputStyle} value={personId} onChange={e => setPersonId(e.target.value)} required>
+          <option value="">Selecione um morador</option>
+          {people.map(p => <option key={p.id} value={p.id}>{p.name} ({p.age} anos)</option>)}
+        </select>
+
+        <label>Categoria</label>
+        <select style={inputStyle} value={categoryId} onChange={e => setCategoryId(e.target.value)} required>
+          <option value="">Selecione uma categoria</option>
+          {categories.map(c => <option key={c.id} value={c.id}>{c.description}</option>)}
+        </select>
+
+        <button type="submit" style={buttonStyle}>Registrar Transação</button>
+      </form>
     </div>
   );
 };
 
-// Estilos rápidos para a tabela
-const tableHeaderStyle: React.CSSProperties = {
-  padding: '12px 15px',
-  textAlign: 'left',
-  borderBottom: '2px solid #dee2e6',
-  color: '#495057'
-};
-
-const tableCellStyle: React.CSSProperties = {
-  padding: '12px 15px',
-  color: '#212529'
-};
+// Estilos básicos
+const formStyle = { display: 'flex', flexDirection: 'column' as const, gap: '10px', backgroundColor: '#fff', padding: '25px', borderRadius: '10px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' };
+const inputStyle = { padding: '10px', borderRadius: '5px', border: '1px solid #cbd5e0', fontSize: '1rem' };
+const buttonStyle = { padding: '12px', backgroundColor: '#4a5568', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' as const, fontSize: '1rem', marginTop: '10px' };
 
 export default TransactionPage;

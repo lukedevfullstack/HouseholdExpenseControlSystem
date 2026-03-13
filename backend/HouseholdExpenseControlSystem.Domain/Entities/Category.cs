@@ -7,6 +7,8 @@ public class Category
     public string Description { get; private set; }
     public string Purpose { get; private set; } // "Receita", "Despesa" ou "Ambas"
 
+    public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
+
     private Category() { }
 
     public Category(string description, string purpose)

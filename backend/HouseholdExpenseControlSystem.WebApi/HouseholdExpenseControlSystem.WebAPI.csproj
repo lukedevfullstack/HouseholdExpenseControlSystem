@@ -7,13 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\HouseholdExpenseControlSystem.Application\HouseholdExpenseControlSystem.Application.csproj" />
-    <ProjectReference Include="..\HouseholdExpenseControlSystem.Domain\HouseholdExpenseControlSystem.Domain.csproj" />
     <ProjectReference Include="..\HouseholdExpenseControlSystem.Infrastructure\HouseholdExpenseControlSystem.Infrastructure.csproj" />
   </ItemGroup>
 

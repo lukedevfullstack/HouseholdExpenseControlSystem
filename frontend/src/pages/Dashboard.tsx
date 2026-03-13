@@ -1,60 +1,112 @@
-import React, { useState } from 'react';
-import PersonSelector from '../components/PersonSelector';
-import SummaryCards from '../components/SummaryCards';
-import TransactionForm from '../components/TransactionForm';
-import TransactionTable from '../components/TransactionTable';
+import React, { useEffect, useState } from 'react';
+import api from '../services/api/api';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+
+// Interface de dados
+interface CategoryTotal {
+  categoryName: string;
+  totalExpenses: number;
+}
+
+interface GeneralTotal {
+  categories: CategoryTotal[];
+  grandTotalRecipes: number;
+  grandTotalExpenses: number;
+  grandTotalBalance: number;
+}
+
+// Cores para as fatias do gráfico
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
 const Dashboard: React.FC = () => {
-  const [selectedPersonId, setSelectedPersonId] = useState<string>('');
-  const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
+  const [data, setData] = useState<GeneralTotal | null>(null);
 
-  // Função para disparar a atualização de saldo e tabela após um novo cadastro
-  const handleTransactionSuccess = () => {
-    setRefreshTrigger(prev => prev + 1);
-  };
+  useEffect(() => {
+    api.get<GeneralTotal>('/Category/totals')
+      .then(res => setData(res.data))
+      .catch(err => console.error(err));
+  }, []);
+
+  if (!data) return <p>Carregando dados...</p>;
+
+  // Preparar dados para o gráfico (apenas categorias com gastos > 0)
+  const chartData = data.categories
+    .filter(cat => cat.totalExpenses > 0)
+    .map(cat => ({
+      name: cat.categoryName,
+      value: cat.totalExpenses
+    }));
 
   return (
-    <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
-      <header style={{ marginBottom: '30px' }}>
-        <h1 style={{ color: '#2c3e50' }}>Dashboard Financeiro</h1>
-        <p style={{ color: '#7f8c8d' }}>Gerencie as contas da sua residência</p>
-      </header>
+    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+      <h1>Resumo Geral</h1>
 
-      {/* 1. Seletor de Pessoa (Filtro Global) */}
-      <section style={{ marginBottom: '30px', backgroundColor: '#fff', padding: '15px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-        <PersonSelector onSelectPerson={setSelectedPersonId} />
-      </section>
+      {/* Cartões de Cima (KPIs) */}
+      <div style={{ display: 'flex', gap: '20px', marginBottom: '30px' }}>
+        <div style={cardStyle}>
+          <small>RECEITAS</small>
+          <h2 style={{ color: '#2ecc71' }}>R$ {data.grandTotalRecipes.toFixed(2)}</h2>
+        </div>
+        <div style={cardStyle}>
+          <small>DESPESAS</small>
+          <h2 style={{ color: '#e74c3c' }}>R$ {data.grandTotalExpenses.toFixed(2)}</h2>
+        </div>
+        <div style={cardStyle}>
+          <small>SALDO LÍQUIDO</small>
+          <h2 style={{ color: '#3498db' }}>R$ {data.grandTotalBalance.toFixed(2)}</h2>
+        </div>
+      </div>
 
-      {/* 2. Cards de Resumo (Receitas, Despesas e Saldo) */}
-      <SummaryCards personId={selectedPersonId} refresh={refreshTrigger} />
-
-      {/* 3. Grid de Conteúdo (Formulário à esquerda, Tabela à direita) */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', 
-        gap: '30px', 
-        marginTop: '30px' 
-      }}>
+      <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
         
-        {/* Coluna do Formulário */}
-        <aside>
-          <div style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
-            <h3 style={{ marginTop: 0 }}>Nova Transação</h3>
-            <TransactionForm onTransactionSuccess={handleTransactionSuccess} />
-          </div>
-        </aside>
+        {/* GRÁFICO DE PIZZA */}
+        <div style={{ ...cardStyle, flex: 1, height: '400px' }}>
+          <h3>Distribuição de Gastos</h3>
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={chartData}
+                cx="50%"
+                cy="45%"
+                innerRadius={60}
+                outerRadius={100}
+                paddingAngle={5}
+                dataKey="value"
+              >
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip formatter={(value: number) => `R$ ${value.toFixed(2)}`} />
+              <Legend verticalAlign="bottom" height={36}/>
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
 
-        {/* Coluna da Tabela */}
-        <main>
-          <div style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
-            <h3 style={{ marginTop: 0 }}>Histórico Recente</h3>
-            <TransactionTable refresh={refreshTrigger} />
-          </div>
-        </main>
+        {/* TABELA LATERAL RÁPIDA */}
+        <div style={{ ...cardStyle, flex: 1 }}>
+          <h3>Gastos por Categoria</h3>
+          <ul style={{ listStyle: 'none', padding: 0 }}>
+            {chartData.map((item, index) => (
+              <li key={index} style={{ padding: '10px 0', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between' }}>
+                <span>{item.name}</span>
+                <strong>R$ {item.value.toFixed(2)}</strong>
+              </li>
+            ))}
+          </ul>
+        </div>
 
       </div>
     </div>
   );
+};
+
+const cardStyle: React.CSSProperties = {
+  backgroundColor: '#fff',
+  padding: '20px',
+  borderRadius: '10px',
+  boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+  flex: 1
 };
 
 export default Dashboard;

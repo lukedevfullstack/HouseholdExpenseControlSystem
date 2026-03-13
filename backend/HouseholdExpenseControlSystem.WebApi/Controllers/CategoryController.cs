@@ -34,4 +34,11 @@ public class CategoryController : ControllerBase
     {
         return Ok(await _categoryService.GetAllAsync());
     }
+
+    [HttpGet("totals")]
+    public async Task<ActionResult<GeneralTotalDto>> GetTotals()
+    {
+        var totals = await _categoryService.GetCategoryTotalsAsync();
+        return Ok(totals);
+    }
 }
