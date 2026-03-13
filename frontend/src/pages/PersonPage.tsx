@@ -96,7 +96,6 @@ const PersonPage: React.FC = () => {
             <tr style={{ textAlign: 'left', borderBottom: '2px solid #eee' }}>
               <th style={{ padding: '10px' }}>Nome</th>
               <th style={{ padding: '10px' }}>Idade</th>
-              <th style={{ padding: '10px' }}>ID do Sistema</th>
             </tr>
           </thead>
           <tbody>
@@ -104,7 +103,6 @@ const PersonPage: React.FC = () => {
               <tr key={p.id} style={{ borderBottom: '1px solid #eee' }}>
                 <td style={{ padding: '10px' }}>{p.name}</td>
                 <td style={{ padding: '10px' }}>{p.age} anos</td>
-                <td style={{ padding: '10px', fontSize: '0.8rem', color: '#95a5a6' }}>{p.id}</td>
               </tr>
             ))}
           </tbody>
